@@ -9,17 +9,19 @@ const testConfigs = {
     none: {
         rotorLabels: ["none"],
         initialPositions: ["A"],
+        ringSettings:["A"]
     },
     zero: {
         rotorLabels: ["I", "II", "III"],
         initialPositions: ["A", "A", "A"],
         reflectorLabel: "Reflector A",
+        ringSettings: ["A", "A", "A"]
     }
 }
 
 const testZeroNoRotate = () => {
-    const {rotorLabels, initialPositions, reflectorLabel} = testConfigs.zero
-    const rotors = createRotors(rotorLabels, initialPositions)
+    const {rotorLabels, initialPositions, reflectorLabel, ringSettings} = testConfigs.zero
+    const rotors = createRotors(rotorLabels, initialPositions, ringSettings)
     const reflector = createReflector(reflectorLabel)
 
     const testCases = [
@@ -44,8 +46,8 @@ const _assertEquals = (actual: any, expected: any) => {
 
 
 const testRotorPositions = () => {
-    const {rotorLabels, initialPositions} = testConfigs.zero
-    const rotor = createRotors(rotorLabels, initialPositions)[0]
+    const {rotorLabels, initialPositions, ringSettings} = testConfigs.zero
+    const rotor = createRotors(rotorLabels, initialPositions, ringSettings)[0]
 
 
     const steps = [

@@ -3,9 +3,10 @@ import {createReflector, createRotor, Rotor} from "./rotor"
 
 import wirings from "./wirings"
 
-export interface RotorConfig {
+export interface RotorConfigs {
         label: string, 
         initialPosition: number,
+        ringSetting: number,
     }[]
 
 export const loadReflector = (reflectorLabel: string) => {
@@ -16,30 +17,31 @@ export const loadReflector = (reflectorLabel: string) => {
     return createReflector(reflector)
 }
 
-export const loadRotors = (rotorConfig: RotorConfig[]) => {
+export const loadRotors = (rotorConfigs: RotorConfigs[]) => {
     const rotors: Rotor[] = []
-    rotorConfig.forEach(rotor => {
-        const rotorWiring = wirings.rotors[rotor.label]
+    rotorConfigs.forEach(rotorConfig => {
+        const rotorWiring = wirings.rotors[rotorConfig.label]
         if (!rotorWiring) {
-            throw new Error(`No rotor with label: ${rotor.label}`)
+            throw new Error(`No rotor with label: ${rotorConfig.label}`)
         }
         rotors.push(createRotor({
             ...rotorWiring,
-            ...rotor
+            ...rotorConfig
         }))
     })
     return rotors
 }
 
-export const createRotors = (rotorLabels: string[], initialPositions: string[]) => {
-    if(rotorLabels.length !== initialPositions.length) {
-        throw new Error(`Number of rotors(${rotorLabels.length}) and initial positions(${initialPositions.length}) do not match!`)
+export const createRotors = (rotorLabels: string[], initialPositions: string[], ringSettings: string[]) => {
+    if(rotorLabels.length !== initialPositions.length || rotorLabels.length !== ringSettings.length) {
+        throw new Error(`Number of rotors(${rotorLabels.length}), initial positions(${initialPositions.length}) and ring settings ${ringSettings.length} do not match!`)
     }
-    const rotorConfig: RotorConfig[] = []
+    const rotorConfig: RotorConfigs[] = []
     for (let i = 0; i < rotorLabels.length; i++) {
         rotorConfig.push({
             label: rotorLabels[i],
-            initialPosition: letterToNumber(initialPositions[i])
+            initialPosition: letterToNumber(initialPositions[i]),
+            ringSetting: letterToNumber(ringSettings[i])
         })
     }
     return loadRotors(rotorConfig)

@@ -16,10 +16,11 @@ export interface RotorSettings {
     mapping: string,
     notch: string[],
     label: string,
+    ringSetting: number
     initialPosition: number
 }
 
-export const getMapper = (wiring: string) => {
+export const getMapper = (wiring: string, ringSetting: number = 0) => {
     const mapping: number[] = []
     const reverseMapping: number[] = []
     for (let i = 0; i < wiring.length; i++) {
@@ -28,25 +29,19 @@ export const getMapper = (wiring: string) => {
         reverseMapping[toI] = i
     }
     const bounds = keepInBounds(wiring.length)
-    console.log(`Mapping Length: ${mapping.length}`)
     return (letter: number, reverse = false, curPosition = 0) => {
-        let mapIdx = bounds(letter - curPosition)
-        // console.log(`letter: ${letter}, curPosition: ${curPosition}, mapIdx: ${mapIdx}`)
-        // const mapIdx = keepInBounds(curPosition + letter, wiring.length)
-        const nextLetter =  bounds((!reverse && mapping || reverseMapping)[mapIdx] + curPosition)
-        // console.log(nextLetter)
-        return nextLetter
+        // Offset letter input based on current rotor position 
+        // e.x. If rotorPos = "C" and input = "D", then effective input is "D"-"C"="A"
+        //         rotorPos = "C"     input = "A",      effective input == bounds("A"-"C") = "Z" + 1 - 2 = "Y"
+        let mapIdx = bounds(letter - curPosition + ringSetting)
+        const mapLetter = (!reverse && mapping || reverseMapping)[mapIdx] // Get next letter
+        return  bounds(mapLetter + curPosition - ringSetting) // Offset mapped letter based on current position
     }
 }
 
 export const keepInBounds = (upperBound: number) => (num: number) => 
-        num < 0 && upperBound + num
-        || num < upperBound && num
-        || num % upperBound
-
-// console.log("******")
-// console.log(keepInBounds(26, 26))
-// console.log("******")
+    num < 0 && upperBound + num 
+    || num % upperBound
 
 export const createReflector = (wiring: string): Reflector => {
     const mapper = getMapper(wiring)
@@ -55,7 +50,7 @@ export const createReflector = (wiring: string): Reflector => {
     }
 }
 
-export const createRotor = ({mapping, notch , label, initialPosition }: RotorSettings): Rotor => {
+export const createRotor = ({mapping, notch , label, ringSetting, initialPosition }: RotorSettings): Rotor => {
     let curPosition = initialPosition
 
     const setPosition = (pos: number) => {
@@ -71,7 +66,8 @@ export const createRotor = ({mapping, notch , label, initialPosition }: RotorSet
         setPosition(curPosition + 1)
         return turnNextRotor
     }
-    const mapper = getMapper(mapping)
+    console.log("Calling getMapper" + label)
+    const mapper = getMapper(mapping, ringSetting)
 
     const encode = (letter: number, reverse = false) => mapper(letter, reverse, curPosition)
 

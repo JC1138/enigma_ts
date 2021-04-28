@@ -7,6 +7,7 @@ import { letterToNumber, numberToLetter } from "./helper/letter_converter";
 export interface EnigmaConfig {
     rotorLabels?: string[]
     initialPositions?: string[]
+    ringSettings?: string[]
     reflectorLabel?: string
     plugboardConnections?: string[][]
 }
@@ -20,6 +21,7 @@ export interface EnigmaMachine {
 export const createEnigmaMachine = ({
     rotorLabels,
     initialPositions, 
+    ringSettings,
     reflectorLabel,
     plugboardConnections,
 }: EnigmaConfig): EnigmaMachine => {
@@ -30,10 +32,10 @@ export const createEnigmaMachine = ({
     let rotorBox: RotorBox
 
     const _init = () => {
-        if (!(rotorLabels && initialPositions && reflectorLabel)) {
+        if (!(rotorLabels && initialPositions && reflectorLabel && ringSettings)) {
             throw new Error("Not enough information to initialize Enigma Machine!")
         }
-        rotors = createRotors(rotorLabels, initialPositions)
+        rotors = createRotors(rotorLabels, initialPositions, ringSettings)
         reflector = loadReflector(reflectorLabel)
         plugboard = createPlugboard(plugboardConnections)
         rotorBox = createRotorBox(rotors, reflector)

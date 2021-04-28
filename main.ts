@@ -4,6 +4,7 @@ const config: EnigmaConfig = {
     rotorLabels: ["I", "III", "III"],
     initialPositions: ["A", "C", "A"],
     reflectorLabel: "Reflector A",
+    ringSettings: ["A", "B", "C"]
 }
 
 const enigmaMachine = createEnigmaMachine(config)
